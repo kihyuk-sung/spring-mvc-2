@@ -16,4 +16,19 @@ class BasicController {
     @GetMapping("text-unescaped")
     fun textUnescaped(model: Model): String = "basic/text-unescaped"
         .apply { model.addAttribute("data", "Hello <b>Spring!</b>") }
+
+    @GetMapping("/variable")
+    fun variable(model: Model): String = "basic/variable"
+        .apply {
+            val userA = User("userA", 10)
+            val userB = User("userB", 20)
+            model.addAttribute("user", userA)
+                .addAttribute("users", listOf(userA, userB))
+                .addAttribute("userMap", mapOf("userA" to userA, "userB" to userB))
+        }
+
+    data class User (
+        val username: String,
+        val age: Int,
+    )
 }
