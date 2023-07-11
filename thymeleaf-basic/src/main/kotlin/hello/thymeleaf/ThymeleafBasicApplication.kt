@@ -1,4 +1,4 @@
-package hello.thymeleafbasic
+package hello.thymeleaf
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
