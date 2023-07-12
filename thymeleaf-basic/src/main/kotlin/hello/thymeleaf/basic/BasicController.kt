@@ -40,6 +40,13 @@ class BasicController {
             model.addAttribute("localDateTime", LocalDateTime.now())
         }
 
+    @GetMapping("/link")
+    fun link(model: Model): String = "basic/link"
+        .apply {
+            model.addAttribute("param1", "data1")
+                .addAttribute("param2", "data2")
+        }
+
     @Component("helloBean")
     class HelloBean {
         fun hello(data: String): String = "Hello $data"
