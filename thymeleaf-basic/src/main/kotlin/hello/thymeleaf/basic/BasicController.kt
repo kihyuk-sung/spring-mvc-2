@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import java.time.LocalDateTime
 
 @Controller
 @RequestMapping("/basic")
@@ -32,6 +33,12 @@ class BasicController {
     @GetMapping("/basic-objects")
     fun basicObjects(session: HttpSession) = "basic/basic-objects"
         .apply { session.setAttribute("sessionData", "Hello Session") }
+
+    @GetMapping("/date")
+    fun date(model: Model): String = "basic/date"
+        .apply {
+            model.addAttribute("localDateTime", LocalDateTime.now())
+        }
 
     @Component("helloBean")
     class HelloBean {
