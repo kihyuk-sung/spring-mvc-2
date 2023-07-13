@@ -47,6 +47,12 @@ class BasicController {
                 .addAttribute("param2", "data2")
         }
 
+    @GetMapping("/literal")
+    fun literal(model: Model): String = "basic/literal"
+        .apply {
+            model.addAttribute("data", "Spring!")
+        }
+
     @Component("helloBean")
     class HelloBean {
         fun hello(data: String): String = "Hello $data"
