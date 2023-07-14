@@ -53,6 +53,13 @@ class BasicController {
             model.addAttribute("data", "Spring!")
         }
 
+    @GetMapping("/operation")
+    fun operation(model: Model): String = "basic/operation"
+        .apply {
+            model.addAttribute("nullData", null)
+                .addAttribute("data", "Spring!")
+        }
+
     @Component("helloBean")
     class HelloBean {
         fun hello(data: String): String = "Hello $data"
