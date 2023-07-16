@@ -101,6 +101,17 @@ class BasicController {
             ))
         }
 
+    @GetMapping("/javascript")
+    fun javascript(model: Model): String = "basic/javascript"
+        .apply {
+            model.addAttribute("user", User("UserD", 40))
+            model.addAttribute("users", listOf(
+                User("UserA", 10),
+                User("UserB", 20),
+                User("UserC", 30),
+            ))
+        }
+
     @Component("helloBean")
     class HelloBean {
         fun hello(data: String): String = "Hello $data"
