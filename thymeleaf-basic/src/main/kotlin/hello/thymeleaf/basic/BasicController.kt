@@ -84,6 +84,13 @@ class BasicController {
             ))
         }
 
+
+    @GetMapping("/comments")
+    fun comments(model: Model): String = "basic/comments"
+        .apply {
+            model.addAttribute("data", "Spring!")
+        }
+
     @Component("helloBean")
     class HelloBean {
         fun hello(data: String): String = "Hello $data"
