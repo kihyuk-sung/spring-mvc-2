@@ -91,6 +91,16 @@ class BasicController {
             model.addAttribute("data", "Spring!")
         }
 
+    @GetMapping("/block")
+    fun block(model: Model): String = "basic/block"
+        .apply {
+            model.addAttribute("users", listOf(
+                User("UserA", 10),
+                User("UserB", 20),
+                User("UserC", 30),
+            ))
+        }
+
     @Component("helloBean")
     class HelloBean {
         fun hello(data: String): String = "Hello $data"
