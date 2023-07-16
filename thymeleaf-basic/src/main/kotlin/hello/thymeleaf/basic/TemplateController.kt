@@ -10,4 +10,7 @@ class TemplateController {
 
     @GetMapping("/fragment")
     fun template(): String = "template/fragment/fragmentMain"
+
+    @GetMapping("/layout")
+    fun layout(): String = "template/layout/layoutMain"
 }
