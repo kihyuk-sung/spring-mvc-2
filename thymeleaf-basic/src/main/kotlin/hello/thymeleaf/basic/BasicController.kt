@@ -63,6 +63,16 @@ class BasicController {
     @GetMapping("/attribute")
     fun attribute(): String = "basic/attribute"
 
+    @GetMapping("/each")
+    fun each(mode: Model) = "basic/each"
+        .apply {
+            mode.addAttribute("users", listOf(
+                User("UserA", 10),
+                User("UserB", 20),
+                User("UserC", 30),
+            ))
+        }
+
     @Component("helloBean")
     class HelloBean {
         fun hello(data: String): String = "Hello $data"
