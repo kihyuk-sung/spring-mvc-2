@@ -3,6 +3,7 @@ package hello.itemservice.web.form
 import hello.itemservice.domain.item.IdGenerator
 import hello.itemservice.domain.item.Item
 import hello.itemservice.domain.item.ItemRepository
+import hello.itemservice.web.form.dto.AddItemDto
 import hello.itemservice.web.form.dto.ItemDto
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -30,7 +31,10 @@ class FormItemController(
     }
 
     @GetMapping("/add")
-    fun addForm(): String  = "form/addForm"
+    fun addForm(model: Model): String  = "form/addForm"
+        .apply {
+            model.addAttribute("item", AddItemDto())
+        }
 
     @PostMapping("/add")
     fun addItem(@ModelAttribute item: ItemDto, redirectAttributes: RedirectAttributes): String =
@@ -48,10 +52,13 @@ class FormItemController(
             .let { "redirect:/form/items/{itemId}" }
 
     @GetMapping("/{itemId}/edit")
-    fun editForm(@PathVariable itemId: Long, model: Model): String = itemRepository
-        .findById(itemId)
-        .let { model.addAttribute("item", it) }
-        .let { "form/editForm" }
+    fun editForm(@PathVariable itemId: Long, model: Model): String = "form/editForm"
+        .apply {
+            itemRepository
+                .findById(itemId)
+                .let { model.addAttribute("item", it) }
+        }
+
 
     @PostMapping("/{itemId}/edit")
     fun edit(@PathVariable itemId: Long, @ModelAttribute item: ItemDto): String = Item(
