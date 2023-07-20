@@ -5,6 +5,8 @@ import hello.itemservice.domain.item.Item
 import hello.itemservice.domain.item.ItemRepository
 import hello.itemservice.web.form.dto.AddItemDto
 import hello.itemservice.web.form.dto.ItemDto
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
@@ -16,6 +18,7 @@ class FormItemController(
     private val itemRepository: ItemRepository,
     private val idGenerator: IdGenerator,
 ){
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
     @GetMapping
     fun items(model: Model): String = itemRepository
         .findAll()
@@ -44,6 +47,7 @@ class FormItemController(
             price = item.price,
             quantity = item.quantity,
         )
+            .apply { log.info("item.open={}", item.open) }
             .let(itemRepository::save)
             .let {
                 redirectAttributes.addAttribute("itemId", it.id)
