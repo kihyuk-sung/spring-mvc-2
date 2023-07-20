@@ -46,6 +46,7 @@ class FormItemController(
             itemName = item.itemName,
             price = item.price,
             quantity = item.quantity,
+            open = item.open,
         )
             .apply { log.info("item.open={}", item.open) }
             .let(itemRepository::save)
@@ -70,6 +71,7 @@ class FormItemController(
         itemName = item.itemName,
         price = item.price,
         quantity = item.quantity,
+        open = item.open,
     )
         .let(itemRepository::save)
         .let { "redirect:/form/items/{itemId}" }

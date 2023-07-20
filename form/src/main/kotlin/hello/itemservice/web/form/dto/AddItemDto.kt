@@ -1,7 +1,8 @@
 package hello.itemservice.web.form.dto
 
-class AddItemDto {
-    var itemName: String? = null
-    var price: Int? = null
-    var quantity: Int? = null
-}
+class AddItemDto(
+    val itemName: String? = null,
+    val price: Int? = null,
+    val quantity: Int? = null,
+    val open: Boolean = false,
+)

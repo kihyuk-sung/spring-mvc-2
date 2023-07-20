@@ -21,6 +21,7 @@ class TestDataInit(
                 itemName = "itemA",
                 price = 10_000,
                 quantity = 10,
+                open = false,
             )
         )
 
@@ -30,6 +31,7 @@ class TestDataInit(
                 itemName = "itemB",
                 price = 20_000,
                 quantity = 20,
+                open = false,
             )
         )
     }
