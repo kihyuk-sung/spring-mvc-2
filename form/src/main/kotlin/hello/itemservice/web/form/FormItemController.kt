@@ -19,6 +19,13 @@ class FormItemController(
     private val idGenerator: IdGenerator,
 ){
     private val log: Logger = LoggerFactory.getLogger(javaClass)
+
+    @ModelAttribute("regions")
+    fun regions(): Map<String, String> = mapOf(
+        "SEOUL" to "서울",
+        "BUSAN" to "부산",
+        "JEJU" to "제주",
+    )
     @GetMapping
     fun items(model: Model): String = itemRepository
         .findAll()
@@ -47,8 +54,10 @@ class FormItemController(
             price = item.price,
             quantity = item.quantity,
             open = item.open,
+            regions = item.regions,
         )
             .apply { log.info("item.open={}", item.open) }
+            .apply { log.info("item.regions={}", item.regions) }
             .let(itemRepository::save)
             .let {
                 redirectAttributes.addAttribute("itemId", it.id)
@@ -72,6 +81,7 @@ class FormItemController(
         price = item.price,
         quantity = item.quantity,
         open = item.open,
+        regions = item.regions,
     )
         .let(itemRepository::save)
         .let { "redirect:/form/items/{itemId}" }

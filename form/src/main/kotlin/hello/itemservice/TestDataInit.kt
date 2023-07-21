@@ -22,6 +22,7 @@ class TestDataInit(
                 price = 10_000,
                 quantity = 10,
                 open = false,
+                regions = listOf(),
             )
         )
 
@@ -32,6 +33,7 @@ class TestDataInit(
                 price = 20_000,
                 quantity = 20,
                 open = false,
+                regions = listOf(),
             )
         )
     }
