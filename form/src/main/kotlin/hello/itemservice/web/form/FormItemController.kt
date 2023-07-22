@@ -3,6 +3,7 @@ package hello.itemservice.web.form
 import hello.itemservice.domain.item.IdGenerator
 import hello.itemservice.domain.item.Item
 import hello.itemservice.domain.item.ItemRepository
+import hello.itemservice.domain.item.ItemType
 import hello.itemservice.web.form.dto.AddItemDto
 import hello.itemservice.web.form.dto.ItemDto
 import org.slf4j.Logger
@@ -26,6 +27,10 @@ class FormItemController(
         "BUSAN" to "부산",
         "JEJU" to "제주",
     )
+
+    @ModelAttribute("itemTypes")
+    fun itemTypes(): Array<ItemType> = ItemType.values()
+
     @GetMapping
     fun items(model: Model): String = itemRepository
         .findAll()
@@ -55,9 +60,11 @@ class FormItemController(
             quantity = item.quantity,
             open = item.open,
             regions = item.regions,
+            itemType = item.itemType,
         )
             .apply { log.info("item.open={}", item.open) }
             .apply { log.info("item.regions={}", item.regions) }
+            .apply { log.info("item.itemType={}", item.itemType) }
             .let(itemRepository::save)
             .let {
                 redirectAttributes.addAttribute("itemId", it.id)
@@ -82,6 +89,7 @@ class FormItemController(
         quantity = item.quantity,
         open = item.open,
         regions = item.regions,
+        itemType = item.itemType,
     )
         .let(itemRepository::save)
         .let { "redirect:/form/items/{itemId}" }

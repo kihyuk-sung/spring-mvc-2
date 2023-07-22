@@ -1,7 +1,7 @@
 package hello.itemservice.domain.item
 
 enum class ItemType(
-    private val description: String,
+    val description: String,
 ) {
     BOOK("도서"),
     FOOD("음식"),

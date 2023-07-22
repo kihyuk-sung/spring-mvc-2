@@ -3,6 +3,7 @@ package hello.itemservice
 import hello.itemservice.domain.item.IdGenerator
 import hello.itemservice.domain.item.Item
 import hello.itemservice.domain.item.ItemRepository
+import hello.itemservice.domain.item.ItemType
 import jakarta.annotation.PostConstruct
 import org.springframework.boot.web.server.PortInUseException
 import org.springframework.stereotype.Component
@@ -23,6 +24,7 @@ class TestDataInit(
                 quantity = 10,
                 open = false,
                 regions = listOf(),
+                itemType = ItemType.BOOK,
             )
         )
 
@@ -34,6 +36,7 @@ class TestDataInit(
                 quantity = 20,
                 open = false,
                 regions = listOf(),
+                itemType = ItemType.FOOD,
             )
         )
     }
