@@ -18,6 +18,10 @@ class ItemRepositoryTest: FunSpec({
             itemName = "itemA",
             price = 10_000,
             quantity = 10,
+            itemType = ItemType.FOOD,
+            open = true,
+            regions = listOf("SEOUL"),
+            deliveryCode = "FAST",
         )
 
         itemRepository.save(item)
@@ -40,6 +44,10 @@ class ItemRepositoryTest: FunSpec({
             itemName = "item1",
             price = 10_000,
             quantity = 10,
+            itemType = ItemType.FOOD,
+            open = true,
+            regions = listOf("SEOUL"),
+            deliveryCode = "FAST",
         )
 
         val item2 = Item(
@@ -47,6 +55,10 @@ class ItemRepositoryTest: FunSpec({
             itemName = "item2",
             price = 20_000,
             quantity = 20,
+            itemType = ItemType.FOOD,
+            open = true,
+            regions = listOf("SEOUL"),
+            deliveryCode = "FAST",
         )
 
         itemRepository.save(item1)
