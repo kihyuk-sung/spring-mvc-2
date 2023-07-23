@@ -1,5 +1,6 @@
 package hello.itemservice.web.form.dto
 
+import hello.itemservice.domain.item.DeliveryCode
 import hello.itemservice.domain.item.ItemType
 
 class AddItemDto(
@@ -9,4 +10,5 @@ class AddItemDto(
     val open: Boolean = false,
     val regions: List<String> = listOf(),
     val itemType: ItemType? = null,
+    val deliveryCode: String? = null,
 )

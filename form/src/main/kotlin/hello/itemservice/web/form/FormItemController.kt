@@ -1,9 +1,6 @@
 package hello.itemservice.web.form
 
-import hello.itemservice.domain.item.IdGenerator
-import hello.itemservice.domain.item.Item
-import hello.itemservice.domain.item.ItemRepository
-import hello.itemservice.domain.item.ItemType
+import hello.itemservice.domain.item.*
 import hello.itemservice.web.form.dto.AddItemDto
 import hello.itemservice.web.form.dto.ItemDto
 import org.slf4j.Logger
@@ -30,6 +27,13 @@ class FormItemController(
 
     @ModelAttribute("itemTypes")
     fun itemTypes(): Array<ItemType> = ItemType.values()
+
+    @ModelAttribute("deliveryCodes")
+    fun deliveryCodes(): List<DeliveryCode> = listOf(
+        DeliveryCode("FAST", "빠른 배송"),
+        DeliveryCode("NORMAL", "일반 배송"),
+        DeliveryCode("SLOW", "느린 배송"),
+    )
 
     @GetMapping
     fun items(model: Model): String = itemRepository
@@ -61,6 +65,7 @@ class FormItemController(
             open = item.open,
             regions = item.regions,
             itemType = item.itemType,
+            deliveryCode = item.deliveryCode,
         )
             .apply { log.info("item.open={}", item.open) }
             .apply { log.info("item.regions={}", item.regions) }
@@ -80,7 +85,6 @@ class FormItemController(
                 .let { model.addAttribute("item", it) }
         }
 
-
     @PostMapping("/{itemId}/edit")
     fun edit(@PathVariable itemId: Long, @ModelAttribute item: ItemDto): String = Item(
         id = itemId,
@@ -90,6 +94,7 @@ class FormItemController(
         open = item.open,
         regions = item.regions,
         itemType = item.itemType,
+        deliveryCode = item.deliveryCode,
     )
         .let(itemRepository::save)
         .let { "redirect:/form/items/{itemId}" }

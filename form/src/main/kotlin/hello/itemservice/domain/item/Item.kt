@@ -8,6 +8,5 @@ data class Item(
     val open: Boolean,
     val regions: List<String>,
     val itemType: ItemType,
-) {
-    val deliveryCode: DeliveryCode = DeliveryCode(code = "FAST", displayName = "빠른 배송")
-}
+    val deliveryCode: String,
+)
