@@ -15,7 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 class FormItemController(
     private val itemRepository: ItemRepository,
     private val idGenerator: IdGenerator,
-){
+) {
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     @ModelAttribute("regions")
@@ -50,32 +50,23 @@ class FormItemController(
     }
 
     @GetMapping("/add")
-    fun addForm(model: Model): String  = "form/addForm"
+    fun addForm(model: Model): String = "form/addForm"
         .apply {
             model.addAttribute("item", AddItemDto())
         }
 
     @PostMapping("/add")
-    fun addItem(@ModelAttribute item: ItemDto, redirectAttributes: RedirectAttributes): String =
-        Item(
-            id = idGenerator.next(),
-            itemName = item.itemName,
-            price = item.price,
-            quantity = item.quantity,
-            open = item.open,
-            regions = item.regions,
-            itemType = item.itemType,
-            deliveryCode = item.deliveryCode,
-        )
-            .apply { log.info("item.open={}", item.open) }
-            .apply { log.info("item.regions={}", item.regions) }
-            .apply { log.info("item.itemType={}", item.itemType) }
-            .let(itemRepository::save)
-            .let {
-                redirectAttributes.addAttribute("itemId", it.id)
-                redirectAttributes.addAttribute("status", true)
-            }
-            .let { "redirect:/form/items/{itemId}" }
+    fun addItem(@ModelAttribute item: ItemDto, redirectAttributes: RedirectAttributes): String = item
+        .toItem(idGenerator.next())
+        .apply { log.info("item.open={}", item.open) }
+        .apply { log.info("item.regions={}", item.regions) }
+        .apply { log.info("item.itemType={}", item.itemType) }
+        .let(itemRepository::save)
+        .let {
+            redirectAttributes.addAttribute("itemId", it.id)
+            redirectAttributes.addAttribute("status", true)
+        }
+        .let { "redirect:/form/items/{itemId}" }
 
     @GetMapping("/{itemId}/edit")
     fun editForm(@PathVariable itemId: Long, model: Model): String = "form/editForm"
@@ -86,16 +77,8 @@ class FormItemController(
         }
 
     @PostMapping("/{itemId}/edit")
-    fun edit(@PathVariable itemId: Long, @ModelAttribute item: ItemDto): String = Item(
-        id = itemId,
-        itemName = item.itemName,
-        price = item.price,
-        quantity = item.quantity,
-        open = item.open,
-        regions = item.regions,
-        itemType = item.itemType,
-        deliveryCode = item.deliveryCode,
-    )
+    fun edit(@PathVariable itemId: Long, @ModelAttribute item: ItemDto): String = item
+        .toItem(itemId)
         .let(itemRepository::save)
         .let { "redirect:/form/items/{itemId}" }
 }
