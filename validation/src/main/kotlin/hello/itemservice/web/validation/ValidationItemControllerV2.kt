@@ -42,7 +42,7 @@ class ValidationItemControllerV2(
         return "validation/v2/addForm"
     }
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     fun addItemV1(@ModelAttribute("item") item: ItemDto, bindingResult: BindingResult, redirectAttributes: RedirectAttributes, model: Model): String {
         if (!StringUtils.hasText(item.itemName)) {
             bindingResult.addError(FieldError("item", "itemName", "상품 이름은 필수입니다."))
@@ -58,6 +58,36 @@ class ValidationItemControllerV2(
             val resultPrice = item.price * item.quantity
             if (resultPrice < 10_000) {
                 bindingResult.addError(ObjectError("item", "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = $resultPrice"))
+            }
+        }
+
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult)
+            return "validation/v2/addForm"
+        }
+
+        val (id) = itemRepository.save(item.toItem(idGenerator.next()))
+        redirectAttributes.addAttribute("itemId", id)
+        redirectAttributes.addAttribute("status", true)
+        return "redirect:/validation/v2/items/{itemId}"
+    }
+
+    @PostMapping("/add")
+    fun addItemV2(@ModelAttribute("item") item: ItemDto, bindingResult: BindingResult, redirectAttributes: RedirectAttributes, model: Model): String {
+        if (!StringUtils.hasText(item.itemName)) {
+            bindingResult.addError(FieldError("item", "itemName", item.itemName, false, null, null, "상품 이름은 필수입니다."))
+        }
+        if (item.price == null || item.price < 1000 || item.price > 1_000_000) {
+            bindingResult.addError(FieldError("item", "price", item.price, false, null, null, "가격은 1,000 ~ 1,000,000 까지 허용합니다."))
+        }
+        if (item.quantity == null || item.quantity < 1 || item.quantity >= 9_999) {
+            bindingResult.addError(FieldError("item", "quantity", item.quantity, false, null, null, "수량은 최대 9,999 까지 허용합니다."))
+        }
+
+        if (item.price != null && item.quantity != null) {
+            val resultPrice = item.price * item.quantity
+            if (resultPrice < 10_000) {
+                bindingResult.addError(ObjectError("item", null, null,"가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = $resultPrice"))
             }
         }
 
