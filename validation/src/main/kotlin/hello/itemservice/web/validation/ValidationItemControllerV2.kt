@@ -72,7 +72,7 @@ class ValidationItemControllerV2(
         return "redirect:/validation/v2/items/{itemId}"
     }
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     fun addItemV2(@ModelAttribute("item") item: ItemDto, bindingResult: BindingResult, redirectAttributes: RedirectAttributes, model: Model): String {
         if (!StringUtils.hasText(item.itemName)) {
             bindingResult.addError(FieldError("item", "itemName", item.itemName, false, null, null, "상품 이름은 필수입니다."))
@@ -88,6 +88,36 @@ class ValidationItemControllerV2(
             val resultPrice = item.price * item.quantity
             if (resultPrice < 10_000) {
                 bindingResult.addError(ObjectError("item", null, null,"가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = $resultPrice"))
+            }
+        }
+
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult)
+            return "validation/v2/addForm"
+        }
+
+        val (id) = itemRepository.save(item.toItem(idGenerator.next()))
+        redirectAttributes.addAttribute("itemId", id)
+        redirectAttributes.addAttribute("status", true)
+        return "redirect:/validation/v2/items/{itemId}"
+    }
+
+    @PostMapping("/add")
+    fun addItemV3(@ModelAttribute("item") item: ItemDto, bindingResult: BindingResult, redirectAttributes: RedirectAttributes, model: Model): String {
+        if (!StringUtils.hasText(item.itemName)) {
+            bindingResult.addError(FieldError("item", "itemName", item.itemName, false, arrayOf("required.item.itemName"), null, null))
+        }
+        if (item.price == null || item.price < 1000 || item.price > 1_000_000) {
+            bindingResult.addError(FieldError("item", "price", item.price, false, arrayOf("range.item.price"), arrayOf(1_000, 1_000_000), null))
+        }
+        if (item.quantity == null || item.quantity < 1 || item.quantity >= 9_999) {
+            bindingResult.addError(FieldError("item", "quantity", item.quantity, false, arrayOf("max.item.quantity"), arrayOf(9_999), null))
+        }
+
+        if (item.price != null && item.quantity != null) {
+            val resultPrice = item.price * item.quantity
+            if (resultPrice < 10_000) {
+                bindingResult.addError(ObjectError("item", arrayOf("totalPriceMin"), arrayOf(10_000, resultPrice),null))
             }
         }
 
