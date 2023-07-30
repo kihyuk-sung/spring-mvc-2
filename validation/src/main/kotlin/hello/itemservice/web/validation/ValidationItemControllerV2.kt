@@ -102,7 +102,7 @@ class ValidationItemControllerV2(
         return "redirect:/validation/v2/items/{itemId}"
     }
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     fun addItemV3(@ModelAttribute("item") item: ItemDto, bindingResult: BindingResult, redirectAttributes: RedirectAttributes, model: Model): String {
         if (!StringUtils.hasText(item.itemName)) {
             bindingResult.addError(FieldError("item", "itemName", item.itemName, false, arrayOf("required.item.itemName"), null, null))
@@ -118,6 +118,36 @@ class ValidationItemControllerV2(
             val resultPrice = item.price * item.quantity
             if (resultPrice < 10_000) {
                 bindingResult.addError(ObjectError("item", arrayOf("totalPriceMin"), arrayOf(10_000, resultPrice),null))
+            }
+        }
+
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult)
+            return "validation/v2/addForm"
+        }
+
+        val (id) = itemRepository.save(item.toItem(idGenerator.next()))
+        redirectAttributes.addAttribute("itemId", id)
+        redirectAttributes.addAttribute("status", true)
+        return "redirect:/validation/v2/items/{itemId}"
+    }
+
+    @PostMapping("/add")
+    fun addItemV4(@ModelAttribute("item") item: ItemDto, bindingResult: BindingResult, redirectAttributes: RedirectAttributes, model: Model): String {
+        if (!StringUtils.hasText(item.itemName)) {
+            bindingResult.rejectValue("itemName", "required")
+        }
+        if (item.price == null || item.price < 1000 || item.price > 1_000_000) {
+            bindingResult.rejectValue("price", "range", arrayOf(1_000, 1_000_000), null)
+        }
+        if (item.quantity == null || item.quantity < 1 || item.quantity >= 9_999) {
+            bindingResult.rejectValue("quantity", "max", arrayOf(9_999), null)
+        }
+
+        if (item.price != null && item.quantity != null) {
+            val resultPrice = item.price * item.quantity
+            if (resultPrice < 10_000) {
+                bindingResult.reject("totalPriceMin", arrayOf(10_000, resultPrice), null)
             }
         }
 
