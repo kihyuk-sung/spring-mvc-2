@@ -45,15 +45,15 @@ class ValidationItemControllerV1(
             if (!StringUtils.hasText(item.itemName)) {
                 put("itemName", "상품 이름은 필수입니다.")
             }
-            if (item.price == null || item.price < 1000 || item.price > 1_000_000) {
+            if (item.price == null || item.price!! < 1000 || item.price!! > 1_000_000) {
                 put("price", "가격은 1,000 ~ 1,000,000 까지 허용합니다.")
             }
-            if (item.quantity == null || item.quantity < 1 || item.quantity >= 9_999) {
+            if (item.quantity == null || item.quantity!! < 1 || item.quantity!! >= 9_999) {
                 put("quantity", "수량은 최대 9,999 까지 허용합니다.")
             }
 
             if (item.price != null && item.quantity != null) {
-                val resultPrice = item.price * item.quantity
+                val resultPrice = item.price!! * item.quantity!!
                 if (resultPrice < 10_000) {
                     put("globalError", "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = $resultPrice")
                 }

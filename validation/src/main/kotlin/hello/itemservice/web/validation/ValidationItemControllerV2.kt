@@ -48,15 +48,15 @@ class ValidationItemControllerV2(
         if (!StringUtils.hasText(item.itemName)) {
             bindingResult.addError(FieldError("item", "itemName", "상품 이름은 필수입니다."))
         }
-        if (item.price == null || item.price < 1000 || item.price > 1_000_000) {
+        if (item.price == null || item.price!! < 1000 || item.price!! > 1_000_000) {
             bindingResult.addError(FieldError("item", "price", "가격은 1,000 ~ 1,000,000 까지 허용합니다."))
         }
-        if (item.quantity == null || item.quantity < 1 || item.quantity >= 9_999) {
+        if (item.quantity == null || item.quantity!! < 1 || item.quantity!! >= 9_999) {
             bindingResult.addError(FieldError("item", "quantity", "수량은 최대 9,999 까지 허용합니다."))
         }
 
         if (item.price != null && item.quantity != null) {
-            val resultPrice = item.price * item.quantity
+            val resultPrice = item.price!! * item.quantity!!
             if (resultPrice < 10_000) {
                 bindingResult.addError(ObjectError("item", "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = $resultPrice"))
             }
@@ -78,15 +78,15 @@ class ValidationItemControllerV2(
         if (!StringUtils.hasText(item.itemName)) {
             bindingResult.addError(FieldError("item", "itemName", item.itemName, false, null, null, "상품 이름은 필수입니다."))
         }
-        if (item.price == null || item.price < 1000 || item.price > 1_000_000) {
+        if (item.price == null || item.price!! < 1000 || item.price!! > 1_000_000) {
             bindingResult.addError(FieldError("item", "price", item.price, false, null, null, "가격은 1,000 ~ 1,000,000 까지 허용합니다."))
         }
-        if (item.quantity == null || item.quantity < 1 || item.quantity >= 9_999) {
+        if (item.quantity == null || item.quantity!! < 1 || item.quantity!! >= 9_999) {
             bindingResult.addError(FieldError("item", "quantity", item.quantity, false, null, null, "수량은 최대 9,999 까지 허용합니다."))
         }
 
         if (item.price != null && item.quantity != null) {
-            val resultPrice = item.price * item.quantity
+            val resultPrice = item.price!! * item.quantity!!
             if (resultPrice < 10_000) {
                 bindingResult.addError(ObjectError("item", null, null,"가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = $resultPrice"))
             }
@@ -108,15 +108,15 @@ class ValidationItemControllerV2(
         if (!StringUtils.hasText(item.itemName)) {
             bindingResult.addError(FieldError("item", "itemName", item.itemName, false, arrayOf("required.item.itemName"), null, null))
         }
-        if (item.price == null || item.price < 1000 || item.price > 1_000_000) {
+        if (item.price == null || item.price!! < 1000 || item.price!! > 1_000_000) {
             bindingResult.addError(FieldError("item", "price", item.price, false, arrayOf("range.item.price"), arrayOf(1_000, 1_000_000), null))
         }
-        if (item.quantity == null || item.quantity < 1 || item.quantity >= 9_999) {
+        if (item.quantity == null || item.quantity!! < 1 || item.quantity!! >= 9_999) {
             bindingResult.addError(FieldError("item", "quantity", item.quantity, false, arrayOf("max.item.quantity"), arrayOf(9_999), null))
         }
 
         if (item.price != null && item.quantity != null) {
-            val resultPrice = item.price * item.quantity
+            val resultPrice = item.price!! * item.quantity!!
             if (resultPrice < 10_000) {
                 bindingResult.addError(ObjectError("item", arrayOf("totalPriceMin"), arrayOf(10_000, resultPrice),null))
             }
@@ -138,15 +138,15 @@ class ValidationItemControllerV2(
 
         ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "itemName", "required")
 
-        if (item.price == null || item.price < 1000 || item.price > 1_000_000) {
+        if (item.price == null || item.price!! < 1000 || item.price!! > 1_000_000) {
             bindingResult.rejectValue("price", "range", arrayOf(1_000, 1_000_000), null)
         }
-        if (item.quantity == null || item.quantity < 1 || item.quantity >= 9_999) {
+        if (item.quantity == null || item.quantity!! < 1 || item.quantity!! >= 9_999) {
             bindingResult.rejectValue("quantity", "max", arrayOf(9_999), null)
         }
 
         if (item.price != null && item.quantity != null) {
-            val resultPrice = item.price * item.quantity
+            val resultPrice = item.price!! * item.quantity!!
             if (resultPrice < 10_000) {
                 bindingResult.reject("totalPriceMin", arrayOf(10_000, resultPrice), null)
             }
