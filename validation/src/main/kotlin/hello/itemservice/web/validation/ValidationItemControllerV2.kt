@@ -3,6 +3,7 @@ package hello.itemservice.web.validation
 import hello.itemservice.domain.item.IdGenerator
 import hello.itemservice.domain.item.dto.ItemDto
 import hello.itemservice.domain.item.ItemRepository
+import hello.itemservice.domain.item.ItemValidator
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Controller
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 class ValidationItemControllerV2(
     private val itemRepository: ItemRepository,
     private val idGenerator: IdGenerator,
+    private val itemValidator: ItemValidator,
 ) {
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
@@ -133,7 +135,7 @@ class ValidationItemControllerV2(
         return "redirect:/validation/v2/items/{itemId}"
     }
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     fun addItemV4(@ModelAttribute("item") item: ItemDto, bindingResult: BindingResult, redirectAttributes: RedirectAttributes, model: Model): String {
 
         ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "itemName", "required")
@@ -151,6 +153,21 @@ class ValidationItemControllerV2(
                 bindingResult.reject("totalPriceMin", arrayOf(10_000, resultPrice), null)
             }
         }
+
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult)
+            return "validation/v2/addForm"
+        }
+
+        val (id) = itemRepository.save(item.toItem(idGenerator.next()))
+        redirectAttributes.addAttribute("itemId", id)
+        redirectAttributes.addAttribute("status", true)
+        return "redirect:/validation/v2/items/{itemId}"
+    }
+
+    @PostMapping("/add")
+    fun addItemV5(@ModelAttribute("item") item: ItemDto, bindingResult: BindingResult, redirectAttributes: RedirectAttributes, model: Model): String {
+        itemValidator.validate(item, bindingResult)
 
         if (bindingResult.hasErrors()) {
             log.info("errors = {}", bindingResult)
