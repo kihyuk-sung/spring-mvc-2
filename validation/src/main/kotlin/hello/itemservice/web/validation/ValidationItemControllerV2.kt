@@ -13,6 +13,8 @@ import org.springframework.validation.BindingResult
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 import org.springframework.validation.ValidationUtils
+import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
@@ -24,6 +26,9 @@ class ValidationItemControllerV2(
     private val itemValidator: ItemValidator,
 ) {
     private val log: Logger = LoggerFactory.getLogger(javaClass)
+
+    @InitBinder
+    fun init(dataBinder: WebDataBinder): Unit = dataBinder.addValidators(itemValidator)
 
     @GetMapping
     fun items(model: Model): String {
@@ -165,10 +170,23 @@ class ValidationItemControllerV2(
         return "redirect:/validation/v2/items/{itemId}"
     }
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     fun addItemV5(@ModelAttribute("item") item: ItemDto, bindingResult: BindingResult, redirectAttributes: RedirectAttributes, model: Model): String {
         itemValidator.validate(item, bindingResult)
 
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult)
+            return "validation/v2/addForm"
+        }
+
+        val (id) = itemRepository.save(item.toItem(idGenerator.next()))
+        redirectAttributes.addAttribute("itemId", id)
+        redirectAttributes.addAttribute("status", true)
+        return "redirect:/validation/v2/items/{itemId}"
+    }
+
+    @PostMapping("/add")
+    fun addItemV6(@Validated @ModelAttribute("item") item: ItemDto, bindingResult: BindingResult, redirectAttributes: RedirectAttributes, model: Model): String {
         if (bindingResult.hasErrors()) {
             log.info("errors = {}", bindingResult)
             return "validation/v2/addForm"
