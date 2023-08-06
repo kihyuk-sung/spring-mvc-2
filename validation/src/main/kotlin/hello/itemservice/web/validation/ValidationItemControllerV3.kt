@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.validation.BindingResult
+import org.springframework.validation.ObjectError
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
@@ -42,6 +43,13 @@ class ValidationItemControllerV3(
 
     @PostMapping("/add")
     fun addItem(@Validated @ModelAttribute("item") item: ItemDto, bindingResult: BindingResult, redirectAttributes: RedirectAttributes, model: Model): String {
+        if (item.price != null && item.quantity != null) {
+            val resultPrice = item.price!! * item.quantity!!
+            if (resultPrice < 10_000) {
+                bindingResult.addError(ObjectError("item", arrayOf("totalPriceMin"), arrayOf(10_000, resultPrice),null))
+            }
+        }
+
         if (bindingResult.hasErrors()) {
             log.info("errors = {}", bindingResult)
             return "validation/v3/addForm"
