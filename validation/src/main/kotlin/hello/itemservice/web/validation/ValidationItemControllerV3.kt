@@ -42,11 +42,23 @@ class ValidationItemControllerV3(
     }
 
     @PostMapping("/add")
-    fun addItem(@Validated @ModelAttribute("item") item: ItemDto, bindingResult: BindingResult, redirectAttributes: RedirectAttributes, model: Model): String {
+    fun addItem(
+        @Validated @ModelAttribute("item") item: ItemDto,
+        bindingResult: BindingResult,
+        redirectAttributes: RedirectAttributes,
+        model: Model
+    ): String {
         if (item.price != null && item.quantity != null) {
             val resultPrice = item.price!! * item.quantity!!
             if (resultPrice < 10_000) {
-                bindingResult.addError(ObjectError("item", arrayOf("totalPriceMin"), arrayOf(10_000, resultPrice),null))
+                bindingResult.addError(
+                    ObjectError(
+                        "item",
+                        arrayOf("totalPriceMin"),
+                        arrayOf(10_000, resultPrice),
+                        null
+                    )
+                )
             }
         }
 
@@ -69,7 +81,30 @@ class ValidationItemControllerV3(
     }
 
     @PostMapping("/{itemId}/edit")
-    fun edit(@PathVariable itemId: Long, @ModelAttribute item: ItemDto): String {
+    fun edit(
+        @PathVariable itemId: Long,
+        @Validated @ModelAttribute("item") item: ItemDto,
+        bindingResult: BindingResult,
+    ): String {
+        if (item.price != null && item.quantity != null) {
+            val resultPrice = item.price!! * item.quantity!!
+            if (resultPrice < 10_000) {
+                bindingResult.addError(
+                    ObjectError(
+                        "item",
+                        arrayOf("totalPriceMin"),
+                        arrayOf(10_000, resultPrice),
+                        null
+                    )
+                )
+            }
+        }
+
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult)
+            return "validation/v3/editForm"
+        }
+
         itemRepository.save(item.toItem(itemId))
         return "redirect:/validation/v3/items/{itemId}"
     }
