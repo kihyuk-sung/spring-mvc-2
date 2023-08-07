@@ -2,6 +2,8 @@ package hello.itemservice.web.validation
 
 import hello.itemservice.domain.item.IdGenerator
 import hello.itemservice.domain.item.ItemRepository
+import hello.itemservice.domain.item.SaveCheck
+import hello.itemservice.domain.item.UpdateCheck
 import hello.itemservice.domain.item.dto.ItemDto
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -41,9 +43,41 @@ class ValidationItemControllerV3(
         return "validation/v3/addForm"
     }
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     fun addItem(
         @Validated @ModelAttribute("item") item: ItemDto,
+        bindingResult: BindingResult,
+        redirectAttributes: RedirectAttributes,
+        model: Model
+    ): String {
+        if (item.price != null && item.quantity != null) {
+            val resultPrice = item.price!! * item.quantity!!
+            if (resultPrice < 10_000) {
+                bindingResult.addError(
+                    ObjectError(
+                        "item",
+                        arrayOf("totalPriceMin"),
+                        arrayOf(10_000, resultPrice),
+                        null
+                    )
+                )
+            }
+        }
+
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult)
+            return "validation/v3/addForm"
+        }
+
+        val (id) = itemRepository.save(item.toItem(idGenerator.next()))
+        redirectAttributes.addAttribute("itemId", id)
+        redirectAttributes.addAttribute("status", true)
+        return "redirect:/validation/v3/items/{itemId}"
+    }
+
+    @PostMapping("/add")
+    fun addItemV2(
+        @Validated(SaveCheck::class) @ModelAttribute("item") item: ItemDto,
         bindingResult: BindingResult,
         redirectAttributes: RedirectAttributes,
         model: Model
@@ -83,7 +117,7 @@ class ValidationItemControllerV3(
     @PostMapping("/{itemId}/edit")
     fun edit(
         @PathVariable itemId: Long,
-        @Validated @ModelAttribute("item") item: ItemDto,
+        @Validated(UpdateCheck::class) @ModelAttribute("item") item: ItemDto,
         bindingResult: BindingResult,
     ): String {
         if (item.price != null && item.quantity != null) {
