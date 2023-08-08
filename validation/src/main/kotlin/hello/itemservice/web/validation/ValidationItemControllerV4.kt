@@ -1,10 +1,11 @@
 package hello.itemservice.web.validation
 
 import hello.itemservice.domain.item.IdGenerator
+import hello.itemservice.domain.item.Item
 import hello.itemservice.domain.item.ItemRepository
-import hello.itemservice.domain.item.SaveCheck
-import hello.itemservice.domain.item.UpdateCheck
 import hello.itemservice.domain.item.dto.ItemDto
+import hello.itemservice.web.validation.form.ItemSaveForm
+import hello.itemservice.web.validation.form.ItemUpdateForm
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Controller
@@ -77,13 +78,13 @@ class ValidationItemControllerV4(
 
     @PostMapping("/add")
     fun addItemV2(
-        @Validated(SaveCheck::class) @ModelAttribute("item") item: ItemDto,
+        @Validated @ModelAttribute("item") form: ItemSaveForm,
         bindingResult: BindingResult,
         redirectAttributes: RedirectAttributes,
         model: Model
     ): String {
-        if (item.price != null && item.quantity != null) {
-            val resultPrice = item.price!! * item.quantity!!
+        if (form.price != null && form.quantity != null) {
+            val resultPrice = form.price * form.quantity
             if (resultPrice < 10_000) {
                 bindingResult.addError(
                     ObjectError(
@@ -101,7 +102,16 @@ class ValidationItemControllerV4(
             return "validation/v4/addForm"
         }
 
-        val (id) = itemRepository.save(item.toItem(idGenerator.next()))
+        val item = with(form) {
+            Item(
+                id = idGenerator.next(),
+                itemName = itemName,
+                price = price,
+                quantity = quantity,
+            )
+        }
+
+        val (id) = itemRepository.save(item)
         redirectAttributes.addAttribute("itemId", id)
         redirectAttributes.addAttribute("status", true)
         return "redirect:/validation/v4/items/{itemId}"
@@ -117,11 +127,11 @@ class ValidationItemControllerV4(
     @PostMapping("/{itemId}/edit")
     fun edit(
         @PathVariable itemId: Long,
-        @Validated(UpdateCheck::class) @ModelAttribute("item") item: ItemDto,
+        @Validated @ModelAttribute("item") form: ItemUpdateForm,
         bindingResult: BindingResult,
     ): String {
-        if (item.price != null && item.quantity != null) {
-            val resultPrice = item.price!! * item.quantity!!
+        if (form.price != null && form.quantity != null) {
+            val resultPrice = form.price * form.quantity
             if (resultPrice < 10_000) {
                 bindingResult.addError(
                     ObjectError(
@@ -139,7 +149,16 @@ class ValidationItemControllerV4(
             return "validation/v4/editForm"
         }
 
-        itemRepository.save(item.toItem(itemId))
+        val item = with(form) {
+            Item(
+                id = id,
+                itemName = itemName,
+                price = price,
+                quantity = quantity
+            )
+        }
+
+        itemRepository.save(item)
         return "redirect:/validation/v4/items/{itemId}"
     }
 }
