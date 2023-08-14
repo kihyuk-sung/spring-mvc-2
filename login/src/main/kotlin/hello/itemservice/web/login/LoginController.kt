@@ -1,6 +1,8 @@
 package hello.itemservice.web.login
 
 import hello.itemservice.domain.login.LoginService
+import jakarta.servlet.http.Cookie
+import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Controller
 import org.springframework.validation.BindingResult
@@ -20,7 +22,11 @@ class LoginController(
 
 
     @PostMapping("/login")
-    fun login(@Validated @ModelAttribute("loginForm") form: LoginForm, bindingResult: BindingResult): String {
+    fun login(
+        @Validated @ModelAttribute("loginForm") form: LoginForm,
+        bindingResult: BindingResult,
+        response: HttpServletResponse
+    ): String {
         if (bindingResult.hasErrors()) {
             return "login/loginForm"
         }
@@ -40,7 +46,23 @@ class LoginController(
         }
 
         // TODO: 로그인 성공 처리
+        val idCookie = Cookie("memberId", member.id.toString())
+        response.addCookie(idCookie)
+
         return "redirect:/"
+    }
+
+    @PostMapping("logout")
+    fun logout(response: HttpServletResponse): String {
+        expireCookie(response, "memberId")
+        return "redirect:/"
+    }
+
+    fun expireCookie(response: HttpServletResponse, cookieName: String) {
+        val cookie = Cookie(cookieName, null).apply {
+            maxAge = 0
+        }
+        response.addCookie(cookie)
     }
 
 }
