@@ -1,6 +1,7 @@
 package hello.itemservice.web.login
 
 import hello.itemservice.domain.login.LoginService
+import hello.itemservice.web.session.SessionConstants
 import hello.itemservice.web.session.SessionManager
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
@@ -55,7 +56,7 @@ class LoginController(
         return "redirect:/"
     }
 
-    @PostMapping("/login")
+//    @PostMapping("/login")
     fun loginV2(
         @Validated @ModelAttribute("loginForm") form: LoginForm,
         bindingResult: BindingResult,
@@ -85,15 +86,53 @@ class LoginController(
         return "redirect:/"
     }
 
-//    @PostMapping("logout")
+    @PostMapping("/login")
+    fun loginV3(
+        @Validated @ModelAttribute("loginForm") form: LoginForm,
+        bindingResult: BindingResult,
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+    ): String {
+        if (bindingResult.hasErrors()) {
+            return "login/loginForm"
+        }
+
+        log.info("form = {}", form)
+
+        val member = with(form) {
+            loginService.login(
+                loginId = loginId,
+                password = password,
+            )
+        }
+
+        if (member == null) {
+            bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.")
+            return "login/loginForm"
+        }
+
+        // TODO: 로그인 성공 처리
+        request.session.setAttribute(SessionConstants.LOGIN_MEMBER, member)
+
+        return "redirect:/"
+    }
+
+
+    //    @PostMapping("logout")
     fun logout(response: HttpServletResponse): String {
         expireCookie(response, "memberId")
         return "redirect:/"
     }
 
-    @PostMapping("logout")
+//    @PostMapping("logout")
     fun logoutV2(request: HttpServletRequest): String {
         sessionManager.expire(request)
+        return "redirect:/"
+    }
+
+    @PostMapping("logout")
+    fun logoutV3(request: HttpServletRequest): String {
+        request.getSession(false)?.invalidate()
         return "redirect:/"
     }
 

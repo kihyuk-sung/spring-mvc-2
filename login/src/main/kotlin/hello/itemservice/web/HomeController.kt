@@ -2,6 +2,7 @@ package hello.itemservice.web
 
 import hello.itemservice.domain.member.Member
 import hello.itemservice.domain.member.MemberRepository
+import hello.itemservice.web.session.SessionConstants
 import hello.itemservice.web.session.SessionManager
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.stereotype.Controller
@@ -26,11 +27,22 @@ class HomeController(
         ?.let { "loginHome" }
         ?: "home"
 
-    @GetMapping("/")
+//    @GetMapping("/")
     fun homeLoginV2(
         request: HttpServletRequest,
         model: Model,
     ): String = (sessionManager.getSession(request) as? Member)
+        ?.let { memberRepository.findById(it.id) }
+        ?.let { model.addAttribute("member", it) }
+        ?.let { "loginHome" }
+        ?: "home"
+
+    @GetMapping("/")
+    fun homeLoginV3(
+        request: HttpServletRequest,
+        model: Model,
+    ): String = request.getSession(false)
+        ?.let { it.getAttribute(SessionConstants.LOGIN_MEMBER) as? Member }
         ?.let { memberRepository.findById(it.id) }
         ?.let { model.addAttribute("member", it) }
         ?.let { "loginHome" }
