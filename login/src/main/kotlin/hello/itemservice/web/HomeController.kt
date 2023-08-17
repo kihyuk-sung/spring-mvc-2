@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.CookieValue
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.SessionAttribute
 
 @Controller
 class HomeController(
@@ -37,12 +38,22 @@ class HomeController(
         ?.let { "loginHome" }
         ?: "home"
 
-    @GetMapping("/")
+//    @GetMapping("/")
     fun homeLoginV3(
         request: HttpServletRequest,
         model: Model,
     ): String = request.getSession(false)
         ?.let { it.getAttribute(SessionConstants.LOGIN_MEMBER) as? Member }
+        ?.let { memberRepository.findById(it.id) }
+        ?.let { model.addAttribute("member", it) }
+        ?.let { "loginHome" }
+        ?: "home"
+
+    @GetMapping("/")
+    fun homeLoginV3Spring(
+        @SessionAttribute(name = SessionConstants.LOGIN_MEMBER, required = false) member: Member?,
+        model: Model,
+    ): String = member
         ?.let { memberRepository.findById(it.id) }
         ?.let { model.addAttribute("member", it) }
         ?.let { "loginHome" }
