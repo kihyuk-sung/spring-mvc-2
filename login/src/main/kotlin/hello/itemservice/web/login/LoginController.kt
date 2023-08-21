@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestParam
 
 @Controller
 class LoginController(
@@ -86,7 +87,7 @@ class LoginController(
         return "redirect:/"
     }
 
-    @PostMapping("/login")
+//    @PostMapping("/login")
     fun loginV3(
         @Validated @ModelAttribute("loginForm") form: LoginForm,
         bindingResult: BindingResult,
@@ -115,6 +116,38 @@ class LoginController(
         request.session.setAttribute(SessionConstants.LOGIN_MEMBER, member)
 
         return "redirect:/"
+    }
+
+    @PostMapping("/login")
+    fun loginV4(
+        @Validated @ModelAttribute("loginForm") form: LoginForm,
+        bindingResult: BindingResult,
+        @RequestParam(defaultValue = "/") redirectURL: String,
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+    ): String {
+        if (bindingResult.hasErrors()) {
+            return "login/loginForm"
+        }
+
+        log.info("form = {}", form)
+
+        val member = with(form) {
+            loginService.login(
+                loginId = loginId,
+                password = password,
+            )
+        }
+
+        if (member == null) {
+            bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.")
+            return "login/loginForm"
+        }
+
+        // TODO: 로그인 성공 처리
+        request.session.setAttribute(SessionConstants.LOGIN_MEMBER, member)
+
+        return "redirect:$redirectURL"
     }
 
 
