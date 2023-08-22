@@ -2,13 +2,23 @@ package hello.itemservice
 
 import hello.itemservice.web.filter.LogFilter
 import hello.itemservice.web.filter.LoginCheckFilter
+import hello.itemservice.web.interceptor.LogInterceptor
 import jakarta.servlet.Filter
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
-class WebConfig {
+class WebConfig: WebMvcConfigurer {
+
+    override fun addInterceptors(registry: InterceptorRegistry) {
+        registry.addInterceptor(LogInterceptor())
+            .order(1)
+            .addPathPatterns("/**")
+            .excludePathPatterns("/css/**", "/*.ico", "/error")
+    }
 
     @Bean
     fun logFilter(): FilterRegistrationBean<Filter> = FilterRegistrationBean<Filter>().apply {
