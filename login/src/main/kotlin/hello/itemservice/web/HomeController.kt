@@ -2,6 +2,7 @@ package hello.itemservice.web
 
 import hello.itemservice.domain.member.Member
 import hello.itemservice.domain.member.MemberRepository
+import hello.itemservice.web.argumentresolver.Login
 import hello.itemservice.web.session.SessionConstants
 import hello.itemservice.web.session.SessionManager
 import jakarta.servlet.http.HttpServletRequest
@@ -49,9 +50,18 @@ class HomeController(
         ?.let { "loginHome" }
         ?: "home"
 
-    @GetMapping("/")
+//    @GetMapping("/")
     fun homeLoginV3Spring(
         @SessionAttribute(name = SessionConstants.LOGIN_MEMBER, required = false) member: Member?,
+        model: Model,
+    ): String = member
+        ?.let { memberRepository.findById(it.id) }
+        ?.let { model.addAttribute("member", it) }
+        ?.let { "loginHome" }
+        ?: "home"
+    @GetMapping("/")
+    fun homeLoginV3ArgumentResolver(
+        @Login member: Member?,
         model: Model,
     ): String = member
         ?.let { memberRepository.findById(it.id) }
